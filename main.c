@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
+#include <stdlib.h>
 
 struct stat stat1, stat2;
 struct tm *time1, *time2;
@@ -25,6 +26,9 @@ int main(){
     blockcmp();
     datecmp();
     timecmp();
+    free(time1);
+    free(time2);
+    return 0;
 }
 
 //파일 1의 정보를 가져오는 함수 작성
@@ -39,37 +43,43 @@ void filestat2(){
 
 //파일 1의 시간 정보를 가져오는 함수 작성
 void filetime1(){
-    time1 = localtime(&stat1.st_mtime);
+    struct tm time1_buf;
+    localtime_r(&stat1.st_mtime, &time1_buf);
+    time1=malloc(sizeof(struct tm)*2);
+    *time1 = time1_buf;
 }
 
 //파일 2의 시간 정보를 가져오는 함수 작성
 void filetime2(){
-    time2 = localtime(&stat2.st_mtime);
+    struct tm time2_buf;
+    localtime_r(&stat2.st_mtime, &time2_buf);
+    time2=malloc(sizeof(struct tm)*2);
+    *time2 = time2_buf;
 }
 
 //두 개의 파일 크기를 비교하는 함수 작성
 void sizecmp(){
     printf("size compare\n");
-   if (stat1.st_size > stat2.st_size)
-      printf("text1 is bigger\n\n");
-   else if (stat1.st_size < stat2.st_size)
-      printf("text2 is bigger\n\n");
-   else
-      printf("sizes are equal\n\n");
+    if (stat1.st_size > stat2.st_size)
+        printf("text1 is bigger\n\n");
+    else if (stat1.st_size < stat2.st_size)
+        printf("text2 is bigger\n\n");
+    else
+        printf("sizes are equal\n\n");
 }
 
 //두 개의 파일 블락 수를 비교하는 함수 작성
 void blockcmp(){
     stat("text1", &stat1);
-      stat("text2", &stat2);
-   
-   printf("block compare\n");
-   if(stat1.st_blocks > stat2.st_blocks)
-      printf("text1 is bigger\n\n");
-   else if(stat1.st_blocks < stat2.st_blocks)
-      printf("text2 is bigger\n\n");
-   else
-      printf("blocks are equal\n\n");
+    stat("text2", &stat2);
+
+    printf("block compare\n");
+    if(stat1.st_blocks > stat2.st_blocks)
+        printf("text1 is bigger\n\n");
+    else if(stat1.st_blocks < stat2.st_blocks)
+        printf("text2 is bigger\n\n");
+    else
+        printf("blocks are equal\n\n");
 }
 
 //두 개의 파일 수정 날짜를 비교하는 함수 작성
@@ -99,6 +109,7 @@ void datecmp() {
             printf("same date\n\n");
         }
     }
+
 }
 
 //두 개의 파일 수정 시간을 비교하는 함수 작성
