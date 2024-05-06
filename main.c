@@ -116,4 +116,4 @@ void timecmp() {
     else {
         printf("same time\n\n");
     }
-    
+}
